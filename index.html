@@ -3,47 +3,99 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Leslie Vankoy — Portfolio</title>
+  <title>Health CRUD — Patients & Meds</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>👋 Hi, I’m Leslie Vankoy</h1>
-    <p>Biomedical & Health Informatics • Data Analytics • Public Health</p>
+    <h1>Health CRUD</h1>
+    <p>Demo interface for Create • Read • Update • Delete (no database required)</p>
   </header>
 
   <main>
-    <section class="intro card">
-      <h2>About Me</h2>
-      <p>
-        I’m a graduate student focusing on Biomedical &amp; Health Informatics (BMHI)
-        with strong interests in healthcare data, biomanufacturing, and building
-        tools that make patient care safer and smarter. I enjoy analytics,
-        dashboards, and turning messy data into useful insights.
-      </p>
-      <p>
-        Outside of school and projects, I’m into fitness, structured routines,
-        and intentional design—bringing the same energy to code and research.
-      </p>
+    <section class="card">
+      <h2>Add New Item</h2>
+      <form id="create-form">
+        <label>
+          Type
+          <select id="type">
+            <option value="Patient">Patient</option>
+            <option value="Medication">Medication</option>
+          </select>
+        </label>
+        <label>
+          Label
+          <input id="label" placeholder="e.g., Jane Doe or Metformin 500mg" required />
+        </label>
+        <button type="submit">Add</button>
+      </form>
     </section>
 
-    <section class="links card">
-      <h2>Project Links</h2>
-      <p>Coming soon — I’ll add links here as new projects go live:</p>
-      <ul>
-        <li><!-- Example: <a href="https://github.com/username/project-1">Project 1</a> --></li>
-        <li><!-- Example: <a href="https://username.github.io/project-2/">Project 2 (GitHub Pages)</a> --></li>
-        <li><!-- Example: <a href="https://www.notion.so/...">Notes / Case Studies</a> --></li>
-      </ul>
+    <section class="card">
+      <h2>All Items</h2>
+      <ul id="list" class="list"></ul>
     </section>
   </main>
 
   <footer>
-    <p>© <span id="year"></span> Leslie Vankoy · Built with GitHub Pages</p>
+    <p>© <span id="year"></span> Demo — GitHub Pages ready</p>
   </footer>
 
+  <template id="item-template">
+    <li class="row">
+      <span class="pill type"></span>
+      <span class="label"></span>
+      <button class="edit">Edit</button>
+      <button class="delete">Delete</button>
+    </li>
+  </template>
+
   <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
+    let items = [
+      { type: "Patient", label: "John Doe" },
+      { type: "Medication", label: "Amoxicillin 500mg" },
+    ];
+
+    const list = document.getElementById("list");
+    const tpl = document.getElementById("item-template");
+    const year = document.getElementById("year");
+    year.textContent = new Date().getFullYear();
+
+    function render() {
+      list.innerHTML = "";
+      items.forEach((item, index) => {
+        const node = tpl.content.firstElementChild.cloneNode(true);
+        node.querySelector(".type").textContent = item.type;
+        node.querySelector(".label").textContent = item.label;
+
+        node.querySelector(".edit").addEventListener("click", () => {
+          const newLabel = prompt("Edit label:", item.label);
+          if (newLabel && newLabel.trim() !== "") {
+            items[index] = { ...item, label: newLabel.trim() };
+            render();
+          }
+        });
+
+        node.querySelector(".delete").addEventListener("click", () => {
+          items.splice(index, 1);
+          render();
+        });
+
+        list.appendChild(node);
+      });
+    }
+
+    document.getElementById("create-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const type = document.getElementById("type").value;
+      const label = document.getElementById("label").value.trim();
+      if (!label) return;
+      items.push({ type, label });
+      e.target.reset();
+      render();
+    });
+
+    render();
   </script>
 </body>
 </html>
